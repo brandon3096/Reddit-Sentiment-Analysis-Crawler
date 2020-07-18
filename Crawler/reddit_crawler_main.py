@@ -7,13 +7,17 @@ import random
 from datetime import date, datetime
 
 if __name__ == "__main__":    
+    # Initialize
     reddit = praw.Reddit('RedditSentimentAnalysisBot')
-
     postIds = {}
     comments = []
-    handler = mysql_queryhandler.queryhandler(10)
+    handler = mysql_queryhandler.queryhandler(50)
     count = 0    
 
+    # Get tracked stocks
+    stocks = handler.get_valid_stocks()
+
+    # Process comment stream
     try:
         for submission in reddit.subreddit('me_irl').stream.submissions():   
             print("New submission")
