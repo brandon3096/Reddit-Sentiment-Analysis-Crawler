@@ -6,6 +6,9 @@ import mysql.connector
 import random
 from datetime import date, datetime
 
+#TODO use newer version of wordnet nouns
+#TODO add word analysis to main crawler logic
+
 if __name__ == "__main__":    
     # Initialize
     reddit = praw.Reddit('RedditSentimentAnalysisBot')
@@ -15,6 +18,9 @@ if __name__ == "__main__":
 
     # Get tracked stocks
     stocks = handler.get_valid_stocks()
+
+    # Get word sentiments
+    
 
     # Process comment stream
     try:

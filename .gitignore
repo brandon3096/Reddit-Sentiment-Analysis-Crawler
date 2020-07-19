@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Lexical database files
+index.txt
+SentiWordNet_3.0.0.txt
+
 # Security
 config.ini
 
