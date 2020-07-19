@@ -9,6 +9,9 @@ from datetime import date, datetime
 #TODO use newer version of wordnet nouns
 #TODO add word analysis to main crawler logic
 
+def analyze_sentiment(text):
+
+
 if __name__ == "__main__":    
     # Initialize
     reddit = praw.Reddit('RedditSentimentAnalysisBot')

@@ -5,7 +5,7 @@ import random
 from datetime import date, datetime
 
 class queryhandler:
-    def __init__(self, queue_size):
+    def __init__(self, queue_size=50):
         db = mysql_dbconfig.read_db_config()
         self.mysql_connection = mysql.connector.connect(**db)
         self.insert_queue = []
@@ -33,7 +33,22 @@ class queryhandler:
             stock_dictionary[ticker] = fullname
         return stock_dictionary
 
+    def set_word_sentiments(self, word_sentiments):
+        schema = table_schemas.tables.schemas["word_sentiments"]
+        insert_query = "INSERT INTO word_sentiments " + schema[0] + " VALUES " + schema[1] + ";"
+        self.cursor.executemany(insert_query, word_sentiments)
+        self.mysql_connection.commit()
+
+    def get_word_sentiments(self):
+        select_query = "SELECT * FROM word_sentiments;"
+        self.cursor.execute(select_query)
+        word_dictionary = {}
+        for (word, sentiment) in self.cursor:
+            word_dictionary[word] = sentiment
+        return word_dictionary
+
     def __del__(self):
-        self.process_queue()
+        if len(self.insert_queue) > 0:
+            self.process_queue()
         self.cursor.close()
         self.mysql_connection.close()
