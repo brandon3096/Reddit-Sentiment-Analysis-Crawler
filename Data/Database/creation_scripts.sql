@@ -12,6 +12,12 @@ CREATE TABLE `stocks_list` (
   PRIMARY KEY (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `word_sentiments` (
+  `word` varchar(50) NOT NULL,
+  `sentiment` decimal(10,5) NOT NULL,
+  PRIMARY KEY (`word`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER 
 VIEW `view_sentiments` AS 
 	select `a`.`ticker` AS `Ticker`
