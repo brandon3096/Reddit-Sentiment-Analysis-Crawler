@@ -6,39 +6,51 @@ import mysql.connector
 import random
 from datetime import date, datetime
 
-#TODO use newer version of wordnet nouns
 #TODO add word analysis to main crawler logic
+#TODO seperate queue handler
+#TODO refactor main crawler
 
-def analyze_sentiment(text):
-
+class crawler:
+    def __init__(self, handler):
+        self.handler = handler
+        # Get tracked stocks
+        self.stocks = self.handler.get_valid_stocks()
+        # Get word sentiments
+        self.word_sentiments = self.handler.get_word_sentiments()
+    
+    def parse_comment(self, comment):
+        store_comment = False
+        stock = ''
+        for x in comment.body.split(' '):   
+            score = 1.0
+            if x in self.word_sentiments:
+                score = self.word_sentiments[x]
+            if x in self.stocks:           
+                stock = x
+                store_comment = True
+                print("Found mention of {} in {}".format(x, comment.body))
+        if store_comment:
+            insert_comment = (stock, "Reddit", score/len(comment.body.split(' ')), datetime.now())
+            self.handler.add_to_queue(insert_comment)
 
 if __name__ == "__main__":    
     # Initialize
     reddit = praw.Reddit('RedditSentimentAnalysisBot')
-    postIds = {}
-    comments = []
+    #postIds = {}
+    #comments = []
     handler = mysql_queryhandler.queryhandler(50)
-
-    # Get tracked stocks
-    stocks = handler.get_valid_stocks()
-
-    # Get word sentiments
-    
+    reddit_crawler = crawler(handler)
 
     # Process comment stream
     try:
         for submission in reddit.subreddit('wallstreetbets').stream.submissions():   
-            postIds[submission.id] = True
+            #postIds[submission.id] = True
             submission.comments.replace_more(limit=None)
             comment_queue = submission.comments[:]  # Seed with top-level
             while comment_queue:
                 comment = comment_queue.pop(0)    
-                for x in comment.body.split(' '):
-                    if x in stocks:
-                        insert_comment = (x, "Reddit", random.randrange(1, 1000), datetime.now())
-                        handler.add_to_queue(insert_comment)
-                        print("Found mention of {} in {}".format(x, comment.body))
-                comments.append(comment)
+                reddit_crawler.parse_comment(comment)
+                #comments.append(comment)
                 comment_queue.extend(comment.replies)
     except KeyboardInterrupt:
         del handler
