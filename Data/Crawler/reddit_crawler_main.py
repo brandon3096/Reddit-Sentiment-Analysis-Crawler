@@ -4,9 +4,9 @@ import mysql_dbconfig
 import mysql_queryhandler
 import mysql.connector
 import random
+import decimal
 from datetime import date, datetime
 
-#TODO add word analysis to main crawler logic
 #TODO seperate queue handler
 #TODO refactor main crawler
 
@@ -21,16 +21,18 @@ class crawler:
     def parse_comment(self, comment):
         store_comment = False
         stock = ''
+        comment_score = decimal.Decimal(0.0)
         for x in comment.body.split(' '):   
-            score = 1.0
+            word_score = decimal.Decimal(1.0)
             if x in self.word_sentiments:
-                score = self.word_sentiments[x]
+                word_score = self.word_sentiments[x]
             if x in self.stocks:           
                 stock = x
                 store_comment = True
                 print("Found mention of {} in {}".format(x, comment.body))
+            comment_score += word_score
         if store_comment:
-            insert_comment = (stock, "Reddit", score/len(comment.body.split(' ')), datetime.now())
+            insert_comment = (stock, "Reddit", comment_score/len(comment.body.split(' ')), datetime.now())
             self.handler.add_to_queue(insert_comment)
 
 if __name__ == "__main__":    
